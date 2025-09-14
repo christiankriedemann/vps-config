@@ -46,24 +46,23 @@ cat > /etc/sysctl.d/99-security-hardening.conf << 'EOF'
 
 # ============= NETWORK SECURITY =============
 
-# IP Spoofing protection
-net.ipv4.conf.all.rp_filter = 1
+# IP Spoofing protection (less strict for VPS compatibility)
 net.ipv4.conf.default.rp_filter = 1
 
-# Ignore ICMP redirects
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv6.conf.all.accept_redirects = 0
-net.ipv4.conf.all.secure_redirects = 0
+# Ignore ICMP redirects (only for default, not all - prevents interface issues)
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv6.conf.default.accept_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
 
-# Ignore send redirects
-net.ipv4.conf.all.send_redirects = 0
+# Ignore send redirects (only for default)
+net.ipv4.conf.default.send_redirects = 0
 
-# Disable source packet routing
-net.ipv4.conf.all.accept_source_route = 0
-net.ipv6.conf.all.accept_source_route = 0
+# Disable source packet routing (only for default)
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv6.conf.default.accept_source_route = 0
 
-# Log Martians (packets with impossible addresses)
-net.ipv4.conf.all.log_martians = 1
+# Log Martians (disabled - can cause issues on VPS)
+# net.ipv4.conf.all.log_martians = 1
 
 # Ignore ICMP ping requests (optional - uncomment to enable)
 #net.ipv4.icmp_echo_ignore_all = 1
@@ -196,10 +195,11 @@ vm.dirty_background_ratio = 5
 net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
 
-# Bridge netfilter (required for Docker)
-net.bridge.bridge-nf-call-iptables = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-arptables = 1
+# Bridge netfilter (removed - causes issues on VPS without br_netfilter module)
+# Uncomment these lines only if Docker is installed and br_netfilter is loaded:
+# net.bridge.bridge-nf-call-iptables = 1
+# net.bridge.bridge-nf-call-ip6tables = 1
+# net.bridge.bridge-nf-call-arptables = 1
 
 # ============================================================================
 EOF
@@ -319,8 +319,8 @@ check_param() {
 }
 
 check_param "net.ipv4.tcp_syncookies" "1"
-check_param "net.ipv4.conf.all.rp_filter" "1"
-check_param "net.ipv4.conf.all.accept_redirects" "0"
+check_param "net.ipv4.conf.default.rp_filter" "1"
+check_param "net.ipv4.conf.default.accept_redirects" "0"
 check_param "kernel.randomize_va_space" "2"
 check_param "fs.protected_symlinks" "1"
 
