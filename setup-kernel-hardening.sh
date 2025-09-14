@@ -251,27 +251,13 @@ EOF
 
 log_success "Created kernel module blacklist"
 
-# ============= GRUB HARDENING =============
+# ============= GRUB HARDENING DISABLED =============
 echo ""
-log_info "Hardening GRUB bootloader..."
-
-if [ -f /etc/default/grub ]; then
-    cp /etc/default/grub "/etc/default/grub.backup.$(date +%Y%m%d_%H%M%S)"
-
-    # Add security parameters to GRUB
-    if ! grep -q "slab_nomerge" /etc/default/grub; then
-        sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="slab_nomerge slub_debug=FZP page_poison=1 pti=on /' /etc/default/grub
-        log_success "Added kernel boot parameters for security"
-    fi
-
-    # Update GRUB
-    if command -v update-grub &>/dev/null; then
-        update-grub 2>/dev/null
-        log_success "GRUB configuration updated"
-    fi
-else
-    log_warning "GRUB config not found - skipping bootloader hardening"
-fi
+log_info "GRUB modifications disabled for safety"
+log_info "Kernel hardening applied via sysctl only"
+# If you need GRUB hardening on a physical server, manually add:
+# slab_nomerge slub_debug=FZP page_poison=1 pti=on
+# to GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub
 
 # ============= COREDUMP RESTRICTION =============
 echo ""
@@ -358,7 +344,8 @@ echo -e "  • /etc/sysctl.d/99-security-hardening.conf"
 echo -e "  • /etc/modprobe.d/security-blacklist.conf"
 echo -e "  • /etc/security/limits.d/99-disable-coredumps.conf"
 echo ""
-echo -e "${YELLOW}Note:${NC} Some changes require a reboot to take full effect"
+echo -e "${YELLOW}Note:${NC} Kernel parameters are applied via sysctl (no GRUB modifications)"
+echo -e "      GRUB changes must be done manually if needed on physical servers"
 echo ""
 
 exit 0
