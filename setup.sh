@@ -498,9 +498,11 @@ echo -e "  3. ${BOLD}Reboot recommended${NC} for full kernel hardening"
 echo ""
 
 # Optional reboot
-read -p "Reboot now to apply all changes? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+echo ""
+echo -n "Reboot now to apply all changes? (y/n) "
+read -n 1 -r REPLY
+echo ""
+if [[ "$REPLY" =~ ^[Yy]$ ]]; then
     echo -e "${YELLOW}Rebooting in 10 seconds...${NC}"
     echo -e "${YELLOW}SSH after reboot: ssh -p 4848 root@$PUBLIC_IP${NC}"
     sleep 10
