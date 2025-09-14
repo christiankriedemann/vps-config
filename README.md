@@ -229,7 +229,7 @@ journalctl -u nftables -f
 
 ## 📝 Lizenz
 
-MIT License - siehe [LICENSE](LICENSE) Datei
+Apache License Version 2.0, January 2004 - siehe [LICENSE](LICENSE) Datei
 
 ## 🤝 Contributing
 
@@ -250,6 +250,6 @@ Bei Problemen:
 ---
 
 **Version**: 1.0
-**Getestet auf**: Debian 11/12/13, Ubuntu 20.04/22.04
+**Getestet auf**: Debian 11/12/13
 **Autor**: Christian Kriedemann
 **Repository**: [github.com/christiankriedemann/vps-config](https://github.com/christiankriedemann/vps-config)
