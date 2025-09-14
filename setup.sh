@@ -171,7 +171,7 @@ SECURITY_PACKAGES=(
 )
 
 MONITORING_PACKAGES=(
-    "sysstat" "iotop" "nethogs" "vnstat" "monit" "logwatch" "molly-guard"
+    "sysstat" "iotop" "nethogs" "vnstat" "logwatch" "molly-guard"
 )
 
 # Install packages using common library function or fallback

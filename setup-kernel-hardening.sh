@@ -283,6 +283,7 @@ cat > /etc/security/limits.d/99-disable-coredumps.conf << 'EOF'
 * hard core 0
 EOF
 
+mkdir -p /etc/systemd/coredump.conf.d/
 cat > /etc/systemd/coredump.conf.d/disable.conf << 'EOF'
 [Coredump]
 Storage=none
