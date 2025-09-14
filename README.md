@@ -4,11 +4,15 @@ Automatisierte Sicherheitskonfiguration für Debian VPS Server mit Firewall, Fai
 
 ## 🚀 Schnellstart (One-Liner Installation)
 
-```bash
-# Komplette automatische Installation mit einem Befehl:
-curl -sSL https://raw.githubusercontent.com/christiankriedemann/vps-config/main/setup.sh | sudo bash
+Komplette automatische Installation mit einem Befehl:
 
-# Alternative mit wget:
+```bash
+curl -sSL https://raw.githubusercontent.com/christiankriedemann/vps-config/main/setup.sh | sudo bash
+```
+
+Alternative mit wget:
+
+```bash
 wget -qO- https://raw.githubusercontent.com/christiankriedemann/vps-config/main/setup.sh | sudo bash
 ```
 
