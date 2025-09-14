@@ -263,6 +263,8 @@ SCRIPTS=(
     "setup-fail2ban.sh"
     "setup-kernel-hardening.sh"
     "setup-auto-updates.sh"
+    "setup-backup-manager.sh"
+    "setup-ssh-keys.sh"
     "check-firewall.sh"
     "lib/common.sh"
     "README.md"
@@ -309,6 +311,7 @@ SETUP_SCRIPTS=(
     "setup-fail2ban.sh:Fail2ban Setup:important"
     "setup-kernel-hardening.sh:Kernel Hardening:optional"
     "setup-auto-updates.sh:Auto Updates:optional"
+    "setup-backup-manager.sh:Backup Manager:optional"
 )
 
 for script_info in "${SETUP_SCRIPTS[@]}"; do
