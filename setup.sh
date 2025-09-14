@@ -320,6 +320,8 @@ cd "$WORK_DIR"
 SCRIPTS=(
     "setup-firewall.sh"
     "setup-fail2ban.sh"
+    "setup-kernel-hardening.sh"
+    "setup-auto-updates.sh"
     "check-firewall.sh"
     "check-scurity.sh"
     "README.md"
@@ -391,7 +393,33 @@ else
     log_warning "Fail2ban setup had issues (non-critical)"
 fi
 
-# Step 3: Verification
+# Step 3: Kernel Hardening
+log_info "Applying kernel security hardening..."
+echo -e "${CYAN}Running setup-kernel-hardening.sh...${NC}"
+if [ -f ./setup-kernel-hardening.sh ]; then
+    if bash ./setup-kernel-hardening.sh; then
+        log_success "Kernel hardening completed"
+    else
+        log_warning "Kernel hardening had issues (non-critical)"
+    fi
+else
+    log_warning "Kernel hardening script not found"
+fi
+
+# Step 4: Automatic Updates
+log_info "Configuring automatic security updates..."
+echo -e "${CYAN}Running setup-auto-updates.sh...${NC}"
+if [ -f ./setup-auto-updates.sh ]; then
+    if bash ./setup-auto-updates.sh; then
+        log_success "Automatic updates configured"
+    else
+        log_warning "Automatic updates setup had issues (non-critical)"
+    fi
+else
+    log_warning "Auto-updates script not found"
+fi
+
+# Step 5: Verification
 echo ""
 log_info "Running security verification..."
 echo -e "${CYAN}Running check-firewall.sh...${NC}"
