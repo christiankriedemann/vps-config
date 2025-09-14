@@ -153,7 +153,9 @@ apt-get update || error_exit "Failed to update package lists"
 log_success "Package lists updated"
 
 log_info "Upgrading existing packages..."
-DEBIAN_FRONTEND=noninteractive apt-get upgrade -y || log_warning "Some packages failed to upgrade"
+# Prevent popularity-contest dialog
+echo "popularity-contest popularity-contest/participate boolean false" | debconf-set-selections
+DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" || log_warning "Some packages failed to upgrade"
 log_success "System packages upgraded"
 
 # Define package groups

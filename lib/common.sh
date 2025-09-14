@@ -107,7 +107,7 @@ install_package() {
 
     # Install package
     log_info "Installing $package..."
-    if DEBIAN_FRONTEND=noninteractive apt-get install -y "$package" &>/dev/null; then
+    if DEBIAN_FRONTEND=noninteractive apt-get install -y "$package" -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" &>/dev/null; then
         log_success "$package installed"
         echo "$package" >> "$INSTALLED_PACKAGES_FILE"
         return 0
