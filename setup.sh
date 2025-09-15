@@ -163,7 +163,7 @@ ESSENTIAL_PACKAGES=(
     "curl" "wget" "git" "ca-certificates" "gnupg" "lsb-release"
     "software-properties-common" "apt-transport-https" "sudo"
     "unzip" "net-tools" "dnsutils" "htop" "iftop" "ncdu"
-    "tree" "jq" "vim" "nano" "rsync" "screen" "tmux"
+    "tree" "jq" "vim" "nano" "rsync" "screen" "tmux" "resolvconf"
 )
 
 SECURITY_PACKAGES=(
