@@ -156,7 +156,16 @@ if command -v docker &>/dev/null; then
     iptables -C FORWARD -j DOCKER-USER 2>/dev/null || \
         iptables -I FORWARD -j DOCKER-USER
 
-    log_success "Docker compatibility configured (filter and NAT tables)"
+    # CRITICAL: Add MASQUERADE for Docker networks (required for outgoing connections)
+    # This allows containers to reach the internet
+    iptables -t nat -C POSTROUTING -s 172.16.0.0/12 ! -o docker0 -j MASQUERADE 2>/dev/null || \
+        iptables -t nat -A POSTROUTING -s 172.16.0.0/12 ! -o docker0 -j MASQUERADE
+
+    # Also add for common Docker bridge network
+    iptables -t nat -C POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE 2>/dev/null || \
+        iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+
+    log_success "Docker compatibility configured (filter and NAT tables with MASQUERADE)"
 fi
 
 # Save iptables rules
