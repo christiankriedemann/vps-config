@@ -320,6 +320,50 @@ else
 fi
 echo ""
 
+# ============= DOCKER CHAINS CHECK =============
+echo -e "${BOLD}[9/9] Docker Firewall Chains${NC}"
+echo -e "${BLUE}────────────────────────────────────────${NC}"
+
+if [ -n "$DOCKER_CMD" ] && [ -n "$IPTABLES_CMD" ] && $DOCKER_CMD info &>/dev/null 2>&1; then
+    echo -e "  ${CYAN}Filter table chains:${NC}"
+    for chain in DOCKER DOCKER-USER DOCKER-ISOLATION-STAGE-1 DOCKER-ISOLATION-STAGE-2; do
+        if $IPTABLES_CMD -L $chain -n &>/dev/null 2>&1; then
+            RULE_COUNT=$($IPTABLES_CMD -L $chain -n 2>/dev/null | tail -n +3 | wc -l)
+            echo -e "    ${GREEN}✔${NC} $chain (${RULE_COUNT} rules)"
+        else
+            echo -e "    ${RED}✗${NC} $chain ${RED}MISSING${NC}"
+        fi
+    done
+
+    echo -e "  ${CYAN}NAT table chains:${NC}"
+    if $IPTABLES_CMD -t nat -L DOCKER -n &>/dev/null 2>&1; then
+        RULE_COUNT=$($IPTABLES_CMD -t nat -L DOCKER -n 2>/dev/null | tail -n +3 | wc -l)
+        echo -e "    ${GREEN}✔${NC} DOCKER (${RULE_COUNT} rules)"
+
+        # Check if DOCKER chain is in PREROUTING
+        if $IPTABLES_CMD -t nat -L PREROUTING -n 2>/dev/null | grep -q "DOCKER"; then
+            echo -e "    ${GREEN}✔${NC} PREROUTING → DOCKER chain present"
+        else
+            echo -e "    ${RED}✗${NC} PREROUTING → DOCKER chain ${RED}MISSING${NC}"
+        fi
+
+        # Check if DOCKER chain is in OUTPUT
+        if $IPTABLES_CMD -t nat -L OUTPUT -n 2>/dev/null | grep -q "DOCKER"; then
+            echo -e "    ${GREEN}✔${NC} OUTPUT → DOCKER chain present"
+        else
+            echo -e "    ${RED}✗${NC} OUTPUT → DOCKER chain ${RED}MISSING${NC}"
+        fi
+    else
+        echo -e "    ${RED}✗${NC} DOCKER chain in NAT table ${RED}MISSING${NC}"
+        echo -e "    ${YELLOW}⚠${NC} This will cause Docker port forwarding to fail!"
+    fi
+elif [ -n "$DOCKER_CMD" ]; then
+    echo -e "  ${YELLOW}⚠${NC} Docker running but iptables not available for checks"
+else
+    echo -e "  ${GRAY}ℹ${NC} Docker not installed or not running"
+fi
+echo ""
+
 # ============= SUMMARY =============
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BOLD}Summary & Recommendations${NC}"

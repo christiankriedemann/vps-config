@@ -136,15 +136,27 @@ iptables -C INPUT -p icmp -j ACCEPT 2>/dev/null || \
 if command -v docker &>/dev/null; then
     log_info "Docker detected, ensuring Docker chains exist..."
 
+    # Create filter table chains
     iptables -N DOCKER 2>/dev/null || true
     iptables -N DOCKER-USER 2>/dev/null || true
     iptables -N DOCKER-ISOLATION-STAGE-1 2>/dev/null || true
     iptables -N DOCKER-ISOLATION-STAGE-2 2>/dev/null || true
 
+    # Create NAT table chains (required for port forwarding)
+    iptables -t nat -N DOCKER 2>/dev/null || true
+
+    # Add DOCKER chain to PREROUTING and OUTPUT in NAT table
+    iptables -t nat -C PREROUTING -m addrtype --dst-type LOCAL -j DOCKER 2>/dev/null || \
+        iptables -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
+
+    iptables -t nat -C OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER 2>/dev/null || \
+        iptables -t nat -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
+
+    # Add DOCKER-USER to FORWARD chain
     iptables -C FORWARD -j DOCKER-USER 2>/dev/null || \
         iptables -I FORWARD -j DOCKER-USER
 
-    log_success "Docker compatibility configured"
+    log_success "Docker compatibility configured (filter and NAT tables)"
 fi
 
 # Save iptables rules
