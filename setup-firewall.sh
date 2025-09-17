@@ -156,16 +156,27 @@ if command -v docker &>/dev/null; then
     iptables -C FORWARD -j DOCKER-USER 2>/dev/null || \
         iptables -I FORWARD -j DOCKER-USER
 
+    # Detect main network interface
+    MAIN_IFACE=$(ip route | grep default | awk '{print $5}' | head -n1)
+    if [ -z "$MAIN_IFACE" ]; then
+        MAIN_IFACE="ens3"  # Fallback for VPS
+    fi
+
     # CRITICAL: Add MASQUERADE for Docker networks (required for outgoing connections)
     # This allows containers to reach the internet
-    iptables -t nat -C POSTROUTING -s 172.16.0.0/12 ! -o docker0 -j MASQUERADE 2>/dev/null || \
-        iptables -t nat -A POSTROUTING -s 172.16.0.0/12 ! -o docker0 -j MASQUERADE
+    # Using the main network interface instead of docker0
+    iptables -t nat -C POSTROUTING -s 172.16.0.0/12 -o ${MAIN_IFACE} -j MASQUERADE 2>/dev/null || \
+        iptables -t nat -A POSTROUTING -s 172.16.0.0/12 -o ${MAIN_IFACE} -j MASQUERADE
 
     # Also add for common Docker bridge network
-    iptables -t nat -C POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE 2>/dev/null || \
-        iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+    iptables -t nat -C POSTROUTING -s 172.17.0.0/16 -o ${MAIN_IFACE} -j MASQUERADE 2>/dev/null || \
+        iptables -t nat -A POSTROUTING -s 172.17.0.0/16 -o ${MAIN_IFACE} -j MASQUERADE
 
-    log_success "Docker compatibility configured (filter and NAT tables with MASQUERADE)"
+    # Coolify custom networks (10.x.x.x range)
+    iptables -t nat -C POSTROUTING -s 10.0.0.0/8 -o ${MAIN_IFACE} -j MASQUERADE 2>/dev/null || \
+        iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o ${MAIN_IFACE} -j MASQUERADE
+
+    log_success "Docker compatibility configured with ${MAIN_IFACE} interface"
 fi
 
 # Save iptables rules
